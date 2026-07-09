@@ -164,7 +164,7 @@
     <div class="subtitle">Fighter (1pt) • Round (1pt) • Method (1pt) • Perfect Trilogy (5pts)</div>
 
     <!-- PASTE YOUR FORMSPREE LINK IN THE ACTION BELOW -->
-    <form id="submissionForm" action="https://formspree.io/f/maqgggke" method="POST" onsubmit="return validatePicks(event)">
+    <form id="submissionForm" action="YOUR_LINK_HERE" method="POST" onsubmit="return validatePicks(event)">
         
         <div class="user-info">
             <input type="text" id="username" name="Participant_Name" placeholder="Enter Your Name" required>
@@ -184,7 +184,7 @@
             { id: 1, section: "Main Card", label: "01_McGregor_Holloway", f1: "Conor McGregor", f2: "Max Holloway" },
             { id: 2, section: "Main Card", label: "02_BSD_Pimblett", f1: "Benoît Saint Denis", f2: "Paddy Pimblett" },
             { id: 3, section: "Main Card", label: "03_Sandhagen_Bautista", f1: "Cory Sandhagen", f2: "Mario Bautista" },
-            { id: 4, section: "Main Card", label: "04_Royval_Kavanagh", f1: "Brandon Royval", f2: "Lone\'er Kavanagh" },
+            { id: 4, section: "Main Card", label: "04_Royval_Kavanagh", f1: "Brandon Royval", f2: "Lone'er Kavanagh" },
             { id: 5, section: "Main Card", label: "05_Green_McKinney", f1: "King Green", f2: "Terrance McKinney" },
             
             { id: 6, section: "Preliminary Card", label: "06_Krylov_Whittaker", f1: "Nikita Krylov", f2: "Robert Whittaker" },
@@ -226,8 +226,8 @@
                         <input type="hidden" name="${fight.label}_Winner" id="input-winner-${fight.id}" value="">
                         
                         <div class="fighters">
-                            <div class="fighter-cell" onclick="selectWinner(${fight.id}, '${fight.f1}', this)">${fight.f1}</div>
-                            <div class="fighter-cell" onclick="selectWinner(${fight.id}, '${fight.f2}', this)">${fight.f2}</div>
+                            <div class="fighter-cell" onclick="selectWinner(${fight.id}, 1, this)">${fight.f1}</div>
+                            <div class="fighter-cell" onclick="selectWinner(${fight.id}, 2, this)">${fight.f2}</div>
                         </div>
                         <div class="props-container">
                             <select name="${fight.label}_Round">
@@ -251,12 +251,16 @@
             });
         }
 
-        function selectWinner(fightId, fighterName, element) {
+        function selectWinner(fightId, fighterNum, element) {
             const row = document.getElementById(`fight-${fightId}`);
             const cells = row.querySelectorAll('.fighter-cell');
             cells.forEach(cell => cell.classList.remove('selected'));
 
             element.classList.add('selected');
+            
+            const fightObj = fights.find(f => f.id === fightId);
+            const fighterName = fighterNum === 1 ? fightObj.f1 : fightObj.f2;
+            
             userPicks[fightId].winner = fighterName;
             document.getElementById(`input-winner-${fightId}`).value = fighterName;
         }
