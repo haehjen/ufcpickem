@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>UFC 329 Full Card Pick 'Em</title>
+    <title>UFC 329 Pick 'Em</title>
     <style>
         :root {
             --bg-color: #121212;
@@ -163,14 +163,15 @@
     <h1>UFC 329 Pick 'Em</h1>
     <div class="subtitle">Fighter (1pt) • Round (1pt) • Method (1pt) • Perfect Trilogy (5pts)</div>
 
-    <form id="submissionForm" action="YOUR_ENDPOINT_HERE" method="POST" onsubmit="return validatePicks(event)">
+    <!-- PASTE YOUR FORMSPREE LINK IN THE ACTION BELOW -->
+    <form id="submissionForm" action="https://formspree.io/f/maqgggke" method="POST" onsubmit="return validatePicks(event)">
         
         <div class="user-info">
-            <input type="text" id="username" name="Participant Name" placeholder="Enter Your Name" required>
+            <input type="text" id="username" name="Participant_Name" placeholder="Enter Your Name" required>
         </div>
 
         <div id="card-layout">
-            <!-- Dynamic lists grouped by section inject here -->
+            <!-- Dynamic elements injection -->
         </div>
 
         <div class="submit-zone">
@@ -180,25 +181,22 @@
 
     <script>
         const fights = [
-            // MAIN CARD
-            { id: 1, section: "Main Card", label: "McGregor_Holloway", f1: "Conor McGregor", f2: "Max Holloway" },
-            { id: 2, section: "Main Card", label: "BSD_Pimblett", f1: "Benoît Saint Denis", f2: "Paddy Pimblett" },
-            { id: 3, section: "Main Card", label: "Sandhagen_Bautista", f1: "Cory Sandhagen", f2: "Mario Bautista" },
-            { id: 4, section: "Main Card", label: "Royval_Kavanagh", f1: "Brandon Royval", f2: "Lone'er Kavanagh" },
-            { id: 5, section: "Main Card", label: "Green_McKinney", f1: "King Green", f2: "Terrance McKinney" },
+            { id: 1, section: "Main Card", label: "01_McGregor_Holloway", f1: "Conor McGregor", f2: "Max Holloway" },
+            { id: 2, section: "Main Card", label: "02_BSD_Pimblett", f1: "Benoît Saint Denis", f2: "Paddy Pimblett" },
+            { id: 3, section: "Main Card", label: "03_Sandhagen_Bautista", f1: "Cory Sandhagen", f2: "Mario Bautista" },
+            { id: 4, section: "Main Card", label: "04_Royval_Kavanagh", f1: "Brandon Royval", f2: "Lone'er Kavanagh" },
+            { id: 5, section: "Main Card", label: "05_Green_McKinney", f1: "King Green", f2: "Terrance McKinney" },
             
-            // PRELIMS
-            { id: 6, section: "Preliminary Card", label: "Krylov_Whittaker", f1: "Nikita Krylov", f2: "Robert Whittaker" },
-            { id: 7, section: "Preliminary Card", label: "Steveson_Ellison", f1: "Gable Steveson", f2: "Elisha Ellison" },
-            { id: 8, section: "Preliminary Card", label: "Garbrandt_Yanez", f1: "Cody Garbrandt", f2: "Adrian Yanez" },
-            { id: 9, section: "Preliminary Card", label: "Riley_Kamaka", f1: "Luke Riley", f2: "Kai Kamaka III" },
+            { id: 6, section: "Preliminary Card", label: "06_Krylov_Whittaker", f1: "Nikita Krylov", f2: "Robert Whittaker" },
+            { id: 7, section: "Preliminary Card", label: "07_Steveson_Ellison", f1: "Gable Steveson", f2: "Elisha Ellison" },
+            { id: 8, section: "Preliminary Card", label: "08_Garbrandt_Yanez", f1: "Cody Garbrandt", f2: "Adrian Yanez" },
+            { id: 9, section: "Preliminary Card", label: "09_Riley_Kamaka", f1: "Luke Riley", f2: "Kai Kamaka III" },
             
-            // EARLY PRELIMS
-            { id: 10, section: "Early Prelims", label: "Cortez_Cong", f1: "Tracy Cortez", f2: "Wang Cong" },
-            { id: 11, section: "Early Prelims", label: "Pinas_Almeida", f1: "Damian Pinas", f2: "Cesar Almeida" },
-            { id: 12, section: "Early Prelims", label: "Basharat_Garza", f1: "Farid Basharat", f2: "John Garza" },
-            { id: 13, section: "Early Prelims", label: "Gandra_Reese", f1: "Ryan Gandra", f2: "Zachary Reese" },
-            { id: 14, section: "Early Prelims", label: "Costa_Durden", f1: "Alessandro Costa", f2: "Cody Durden" }
+            { id: 10, section: "Early Prelims", label: "10_Cortez_Cong", f1: "Tracy Cortez", f2: "Wang Cong" },
+            { id: 11, section: "Early Prelims", label: "11_Pinas_Almeida", f1: "Damian Pinas", f2: "Cesar Almeida" },
+            { id: 12, section: "Early Prelims", label: "12_Basharat_Garza", f1: "Farid Basharat", f2: "John Garza" },
+            { id: 13, section: "Early Prelims", label: "13_Gandra_Reese", f1: "Ryan Gandra", f2: "Zachary Reese" },
+            { id: 14, section: "Early Prelims", label: "14_Costa_Durden", f1: "Alessandro Costa", f2: "Cody Durden" }
         ];
 
         const userPicks = {};
@@ -211,10 +209,8 @@
             fights.forEach(fight => {
                 userPicks[fight.id] = { winner: "" };
 
-                // Handle Section Headers cleanly
                 if (fight.section !== currentSection) {
                     currentSection = fight.section;
-                    
                     const header = document.createElement('div');
                     header.className = 'section-header';
                     header.innerText = currentSection;
