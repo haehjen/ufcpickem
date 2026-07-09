@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>UFC 239 Pick 'Em</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --accent-selected: #d20a0a;
+            --border-color: #333333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            padding-bottom: 90px;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .user-info {
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+        }
+
+        .user-info input {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .fight-container {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .fight-row {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .fighters {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .fighter-cell {
+            padding: 20px 10px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: background 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .fighter-cell:first-child {
+            border-right: 1px solid var(--border-color);
+        }
+
+        .fighter-cell.selected {
+            background-color: var(--accent-selected);
+            color: #fff;
+        }
+
+        .props-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 12px;
+            background-color: #171717;
+        }
+
+        select {
+            background-color: #2a2a2a;
+            color: white;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            outline: none;
+            width: 100%;
+            -webkit-appearance: none;
+        }
+
+        .submit-zone {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #121212;
+            padding: 15px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .btn-submit {
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-radius: 30px;
+            width: 100%;
+            max-width: 400px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>UFC 239 Pick 'Em</h1>
+    <div class="subtitle">Fighter (1pt) • Round (1pt) • Method (1pt) • Perfect Trilogy (5pts)</div>
+
+    <!-- MAIN FORM -->
+    <form id="submissionForm" action="YOUR_ENDPOINT_HERE" method="POST" onsubmit="return validatePicks(event)">
+        
+        <div class="user-info">
+            <input type="text" id="username" name="Participant Name" placeholder="Enter Your Name" required>
+        </div>
+
+        <div class="fight-container" id="card">
+            <!-- Hidden elements to safely pass data via standard form POST -->
+        </div>
+
+        <div class="submit-zone">
+            <button type="submit" class="btn-submit">Lock In Picks</button>
+        </div>
+    </form>
+
+    <script>
+        const fights = [
+            { id: 1, label: "Main_Event", f1: "Jon Jones", f2: "Thiago Santos" },
+            { id: 2, label: "Co_Main", f1: "Amanda Nunes", f2: "Holly Holm" },
+            { id: 3, label: "Welterweight", f1: "Jorge Masvidal", f2: "Ben Askren" },
+            { id: 4, label: "Light_Heavyweight", f1: "Jan Błachowicz", f2: "Luke Rockhold" },
+            { id: 5, label: "Lightweight", f1: "Michael Chiesa", f2: "Diego Sanchez" }
+        ];
+
+        const userPicks = {};
+
+        function initCard() {
+            const container = document.getElementById('card');
+            
+            fights.forEach(fight => {
+                userPicks[fight.id] = { winner: "" };
+
+                const html = `
+                    <div class="fight-row" id="fight-${fight.id}">
+                        <!-- Hidden input to store selected winner for the form submission -->
+                        <input type="hidden" name="${fight.label}_Winner" id="input-winner-${fight.id}" value="">
+                        
+                        <div class="fighters">
+                            <div class="fighter-cell" onclick="selectWinner(${fight.id}, '${fight.f1}', this)">${fight.f1}</div>
+                            <div class="fighter-cell" onclick="selectWinner(${fight.id}, '${fight.f2}', this)">${fight.f2}</div>
+                        </div>
+                        <div class="props-container">
+                            <select name="${fight.label}_Round">
+                                <option value="None">Optional: Select Round</option>
+                                <option value="R1">Round 1</option>
+                                <option value="R2">Round 2</option>
+                                <option value="R3">Round 3</option>
+                                <option value="R4">Round 4</option>
+                                <option value="R5">Round 5</option>
+                            </select>
+                            <select name="${fight.label}_Method">
+                                <option value="None">Optional: Select Method</option>
+                                <option value="KO_TKO">KO / TKO</option>
+                                <option value="Submission">Submission</option>
+                                <option value="Decision">Decision</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += html;
+            });
+        }
+
+        function selectWinner(fightId, fighterName, element) {
+            const row = document.getElementById(`fight-${fightId}`);
+            const cells = row.querySelectorAll('.fighter-cell');
+            cells.forEach(cell => cell.classList.remove('selected'));
+
+            element.classList.add('selected');
+            userPicks[fightId].winner = fighterName;
+            document.getElementById(`input-winner-${fightId}`).value = fighterName;
+        }
+
+        function validatePicks(event) {
+            let pickedCount = 0;
+            for (let id in userPicks) {
+                if (userPicks[id].winner) pickedCount++;
+            }
+
+            if (pickedCount < fights.length) {
+                alert(`Hold up! Please pick a winner for all ${fights.length} fights.`);
+                return false;
+            }
+            return true;
+        }
+
+        window.onload = initCard;
+    </script>
+</body>
+</html>
